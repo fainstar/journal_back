@@ -112,6 +112,9 @@ journal_back/
 - docker pull oomaybeoo/journal-back:latest
 - docker run -p 8000:8000 -d oomaybeoo/journal-back:latest
 
+## 未來方向
+- **遷移至 IPFS**：將圖片、內文等檔案儲存遷移至星際檔案系統 (IPFS)，以實現去中心化儲存。
+- **檔案空間管理**：新增管理用戶檔案儲存空間的功能。
 
 ## 更新日期
 2025 年 5 月 6 日
