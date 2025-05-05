@@ -79,8 +79,24 @@ async def get_all_images():
         with get_db_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT url, filename FROM images ORDER BY created_at DESC")
-            images = cursor.fetchall()
-        logger.info("成功獲取所有圖片列表")
+            
+            # 將行結果轉換為列表格式，確保前端能正確處理
+            result = cursor.fetchall()
+            images = []
+            for row in result:
+                # 如果是 Row 對象，轉換為列表
+                if hasattr(row, 'keys'):
+                    images.append([row['url'], row['filename']])
+                else:
+                    images.append(row)  # 已經是列表或元組格式
+            
+            # 調試日誌
+            logger.info(f"成功獲取圖片列表，數量: {len(images)}")
+            
+            # 檢查第一個結果的格式（如果有）
+            if images and len(images) > 0:
+                logger.info(f"第一個圖片格式範例: {images[0]}")
+                
         return {"images": images}
     except Exception as e:
         logger.error(f"獲取圖片列表失敗: {str(e)}")

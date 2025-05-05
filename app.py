@@ -1,7 +1,8 @@
-from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 import logging
 import os
 
@@ -33,6 +34,9 @@ app.add_middleware(
 # 建立靜態文件目錄
 os.makedirs("static", exist_ok=True)
 
+# 設置模板引擎 - 將模板目錄更新為 static/templates
+templates = Jinja2Templates(directory="static/templates")
+
 # 掛載靜態文件
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -42,12 +46,12 @@ app.include_router(notes.router)
 app.include_router(tags.router)
 
 # 根路由導向前端
-@app.get("/", response_class=FileResponse)
-async def serve_html():
+@app.get("/", response_class=HTMLResponse)
+async def serve_html(request: Request):
     """
     返回前端HTML界面
     """
-    return FileResponse("index.html")
+    return templates.TemplateResponse("index.html", {"request": request})
 
 # 健康檢查
 @app.get("/health")

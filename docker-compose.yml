@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  journal-back:
+    build: .
+    container_name: journal-back
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./diary.db:/app/diary.db
+    restart: unless-stopped

@@ -1,0 +1,28 @@
+<div class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+    <h2 class="mdc-typography--headline5">文章管理</h2>
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button id="getAllNotes" class="mdc-button mdc-button--raised mdc-button--primary">
+            <span class="mdc-button__label">取得所有文章</span>
+        </button>
+        <button id="createNoteBtn" class="mdc-button mdc-button--raised">
+            <i class="material-icons mdc-button__icon">add</i>
+            <span class="mdc-button__label">新增文章</span>
+        </button>
+    </div>
+    <div id="notesContainer"></div>
+</div>
+
+<!-- Markdown編輯表單 -->
+<div id="markdownEditor" class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-12" style="display: none;">
+    <h2 class="mdc-typography--headline5">編輯文章</h2>
+    <textarea id="markdownContent" placeholder="輸入Markdown內容..."></textarea>
+    <div style="display: flex; gap: 10px;">
+        <button id="saveMarkdown" class="mdc-button mdc-button--raised mdc-button--primary">
+            <span class="mdc-button__label">儲存</span>
+        </button>
+        <button id="cancelEditBtn" class="mdc-button mdc-button--outlined">
+            <span class="mdc-button__label">取消</span>
+        </button>
+    </div>
+    <div id="markdownResult" class="mt-3"></div>
+</div>

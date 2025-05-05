@@ -1,0 +1,39 @@
+<div class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+    <h2 class="mdc-typography--headline5">圖片管理</h2>
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button id="getAllImages" class="mdc-button mdc-button--raised mdc-button--primary">
+            <span class="mdc-button__label">取得所有圖片</span>
+        </button>
+        <button id="uploadImageBtn" class="mdc-button mdc-button--raised">
+            <i class="material-icons mdc-button__icon">add</i>
+            <span class="mdc-button__label">上傳圖片</span>
+        </button>
+    </div>
+    <div id="imagesContainer"></div>
+</div>
+
+<!-- 圖片上傳表單 -->
+<div id="imageUploadForm" class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-12" style="display: none;">
+    <h2 class="mdc-typography--headline5">上傳圖片</h2>
+    <form id="uploadForm">
+        <div class="mdc-text-field mdc-text-field--outlined" style="width: 100%; margin-bottom: 15px;">
+            <input type="file" id="imageFile" class="mdc-text-field__input" accept="image/*" required>
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label class="mdc-floating-label">選擇圖片</label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="mdc-button mdc-button--raised mdc-button--primary">
+                <span class="mdc-button__label">上傳</span>
+            </button>
+            <button type="button" id="cancelUploadBtn" class="mdc-button mdc-button--outlined">
+                <span class="mdc-button__label">取消</span>
+            </button>
+        </div>
+    </form>
+    <div id="imageResult" class="mt-3"></div>
+</div>

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}日記本管理系統{% endblock %}
+
+{% block content %}
+    <!-- 圖片管理區塊 -->
+    {% include 'images.html' %}
+    
+    <!-- 文章管理區塊 -->
+    {% include 'notes.html' %}
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', path='js/app.js') }}"></script>
+{% endblock %}
