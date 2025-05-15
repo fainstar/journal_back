@@ -4,6 +4,9 @@ const API_BASE_URL = 'http://127.0.0.1:8000';
 
 // 初始化 Marked.js 和 Material Components
 document.addEventListener('DOMContentLoaded', () => {
+    // 綁定檔案上傳相關事件
+    initializeFileUpload();
+    
     // 自定義渲染器，處理圖片路徑問題
     const renderer = new marked.Renderer();
     
@@ -118,25 +121,32 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 顯示/隱藏表單事件處理
-document.getElementById('uploadImageBtn').addEventListener('click', () => {
-    document.getElementById('imageUploadForm').style.display = 'block';
-});
+if (document.getElementById('uploadImageBtn')) {
+    document.getElementById('uploadImageBtn').addEventListener('click', () => {
+        document.getElementById('imageUploadForm').style.display = 'block';
+    });
+}
 
-document.getElementById('cancelUploadBtn').addEventListener('click', () => {
-    document.getElementById('imageUploadForm').style.display = 'none';
-});
+if (document.getElementById('cancelUploadBtn')) {
+    document.getElementById('cancelUploadBtn').addEventListener('click', () => {
+        document.getElementById('imageUploadForm').style.display = 'none';
+    });
+}
 
-document.getElementById('createNoteBtn').addEventListener('click', () => {
-    document.getElementById('markdownEditor').style.display = 'block';
-    document.getElementById('markdownContent').value = '';
-    // 重置編輯ID，表示這是一篇新文章
-    currentEditingNoteId = null;
-});
+if (document.getElementById('createNoteBtn')) {
+    document.getElementById('createNoteBtn').addEventListener('click', () => {
+        document.getElementById('markdownEditor').style.display = 'block';
+        document.getElementById('markdownContent').value = '';
+        currentEditingNoteId = null;
+    });
+}
 
-document.getElementById('cancelEditBtn').addEventListener('click', () => {
-    document.getElementById('markdownEditor').style.display = 'none';
-    currentEditingNoteId = null; // 取消時也重置編輯ID
-});
+if (document.getElementById('cancelEditBtn')) {
+    document.getElementById('cancelEditBtn').addEventListener('click', () => {
+        document.getElementById('markdownEditor').style.display = 'none';
+        currentEditingNoteId = null;
+    });
+}
 
 // 圖片上傳處理
 document.getElementById('uploadForm').addEventListener('submit', async (e) => {
@@ -417,5 +427,301 @@ function editNote(id) {
         });
     } catch (error) {
         alert(`取得文章失敗: ${error.message}`);
+    }
+}
+
+// 檔案管理相關功能
+function initializeFileUpload() {
+    console.log('初始化檔案上傳功能');
+    
+    // 綁定檔案列表載入按鈕
+    const getAllFilesBtn = document.getElementById('getAllFiles');
+    console.log('getAllFiles按鈕元素:', getAllFilesBtn);
+    
+    if (getAllFilesBtn) {
+        getAllFilesBtn.addEventListener('click', getAllFiles);
+        console.log('已綁定getAllFiles事件');
+        // 頁面載入時自動獲取
+        getAllFiles();
+    }
+
+    // 綁定檔案上傳按鈕
+    const uploadFileBtn = document.getElementById('uploadFileBtn');
+    console.log('uploadFileBtn元素:', uploadFileBtn);
+    
+    if (uploadFileBtn) {
+        uploadFileBtn.addEventListener('click', uploadFile);
+        console.log('已綁定uploadFile事件');
+    }
+}
+
+// 獲取所有檔案
+function getAllFiles() {
+    console.log('開始獲取所有檔案');
+    const filesListEl = document.getElementById('filesList');
+    console.log('filesList元素:', filesListEl);
+    
+    if (!filesListEl) {
+        console.warn('找不到filesList元素');
+        return;
+    }
+
+    filesListEl.innerHTML = '<div class="loading-message">載入中...</div>';
+
+    console.log('發送請求到:', `${API_BASE_URL}/files/all/`);
+    fetch(`${API_BASE_URL}/files/all/`)
+        .then(response => {
+            console.log('獲取檔案列表回應:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('獲取檔案列表數據:', data);
+            if (data.files && Array.isArray(data.files)) {
+                console.log(`找到 ${data.files.length} 個檔案`);
+                displayFiles(data.files);
+            } else {
+                console.warn('未找到檔案或格式不正確:', data);
+                filesListEl.innerHTML = '<div class="loading-message">沒有找到檔案</div>';
+            }
+        })
+        .catch(error => {
+            console.error('獲取檔案列表失敗:', error);
+            filesListEl.innerHTML = `<div class="loading-message">載入失敗: ${error.message}</div>`;
+        });
+}
+
+// 顯示檔案列表
+function displayFiles(files) {
+    console.log('開始顯示檔案列表:', files);
+    
+    const filesListEl = document.getElementById('filesList');
+    if (!filesListEl) {
+        console.warn('找不到檔案列表容器');
+        return;
+    }
+
+    if (!files || files.length === 0) {
+        console.log('沒有檔案要顯示');
+        filesListEl.innerHTML = '<div class="loading-message">尚未上傳任何檔案</div>';
+        return;
+    }
+
+    // 清空列表
+    filesListEl.innerHTML = '';
+    console.log(`準備顯示 ${files.length} 個檔案`);
+
+    // 添加每個檔案卡片
+    files.forEach((file, index) => {
+        console.log(`處理第 ${index + 1} 個檔案:`, file);
+        try {
+            const fileCard = createFileCard(file);
+            filesListEl.appendChild(fileCard);
+        } catch (error) {
+            console.error(`創建檔案卡片失敗 (${file.filename}):`, error);
+        }
+    });
+}
+
+// 創建檔案卡片
+function createFileCard(file) {
+    console.log('創建檔案卡片:', file);
+    
+    const fileCard = document.createElement('div');
+    fileCard.className = 'file-card';
+    fileCard.dataset.fileId = file.id;
+
+    try {
+        // 設置 icon，根據檔案類型選擇不同 icon
+        const iconName = getFileIconByType(file.type);
+        console.log(`檔案類型: ${file.type}, 使用圖標: ${iconName}`);
+        
+        // 計算檔案大小的可讀格式
+        const fileSize = formatFileSize(file.size);
+        console.log(`原始檔案大小: ${file.size}, 格式化後: ${fileSize}`);
+
+        // 判斷是否支援預覽
+        const isPreviewable = ['image', 'video'].includes(file.type);
+        console.log(`檔案是否可預覽: ${isPreviewable}`);
+
+        // 準備預覽按鈕
+        const previewButton = isPreviewable ? `
+            <button onclick="previewMedia('/files/download/${file.filename}', '${file.original_filename}', '${file.type}')" class="preview-button">
+                ${file.type === 'video' ? '播放' : '預覽'}
+            </button>
+        ` : '';
+
+        // 生成卡片內容
+        fileCard.innerHTML = `
+            <div class="file-icon">
+                <i class="material-icons">${iconName}</i>
+            </div>
+            <div class="file-info">
+                <div class="file-name" title="${file.original_filename}">${file.original_filename}</div>
+                <div class="file-size">${fileSize}</div>
+            </div>
+            <div class="file-actions">
+                <a href="/files/download/${file.filename}" class="mdc-button mdc-button--outlined" target="_blank">
+                    <span class="mdc-button__label">下載</span>
+                </a>
+                ${previewButton}
+                <button onclick="deleteFile(${file.id})" class="mdc-button mdc-button--outlined">
+                    <span class="mdc-button__label">刪除</span>
+                </button>
+            </div>
+        `;
+        
+        console.log('檔案卡片創建成功');
+        return fileCard;
+    } catch (error) {
+        console.error('創建檔案卡片時發生錯誤:', error);
+        throw error;
+    }
+}
+
+// 取得檔案類型對應的 icon
+function getFileIconByType(fileType) {
+    console.log('取得檔案圖標，檔案類型:', fileType);
+    
+    if (!fileType) {
+        console.warn('未提供檔案類型，使用預設圖標');
+        return 'insert_drive_file';
+    }
+    
+    const iconMap = {
+        'image': 'image',
+        'video': 'video_library',
+        'audio': 'audio_file',
+        'document': 'description',
+        'archive': 'folder_zip',
+        'pdf': 'picture_as_pdf'
+    };
+
+    const icon = iconMap[fileType] || 'insert_drive_file';
+    console.log(`檔案類型 ${fileType} 對應的圖標:`, icon);
+    return icon;
+}
+
+// 格式化檔案大小
+function formatFileSize(bytes) {
+    if (bytes < 1024) {
+        return bytes + ' B';
+    } else if (bytes < 1024 * 1024) {
+        return (bytes / 1024).toFixed(1) + ' KB';
+    } else if (bytes < 1024 * 1024 * 1024) {
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    } else {
+        return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+    }
+}
+
+// 上傳檔案
+async function uploadFile() {
+    console.log('開始上傳檔案');
+    const fileInput = document.getElementById('fileInput');
+    console.log('fileInput元素:', fileInput);
+    
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        console.warn('未選擇檔案');
+        alert('請選擇一個檔案');
+        return;
+    }
+
+    const file = fileInput.files[0];
+    console.log('選擇的檔案:', {
+        name: file.name,
+        size: file.size,
+        type: file.type
+    });
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        console.log('發送上傳請求到:', `${API_BASE_URL}/files/upload/`);
+        const response = await fetch(`${API_BASE_URL}/files/upload/`, {
+            method: 'POST',
+            body: formData
+        });
+
+        console.log('上傳回應狀態:', response.status);
+        if (!response.ok) {
+            throw new Error(`上傳失敗: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('上傳成功，伺服器回應:', result);
+        
+        // 重新載入檔案列表
+        getAllFiles();
+        
+        // 清空輸入
+        fileInput.value = '';
+        console.log('已清空檔案輸入框');
+    } catch (error) {
+        console.error('上傳失敗:', error);
+        alert(`上傳失敗: ${error.message}`);
+    }
+}
+
+// 刪除檔案
+async function deleteFile(fileId) {
+    console.log('準備刪除檔案:', fileId);
+    
+    if (!confirm('確定要刪除此檔案嗎？')) {
+        console.log('使用者取消刪除操作');
+        return;
+    }
+
+    try {
+        console.log('發送刪除請求到:', `${API_BASE_URL}/files/${fileId}`);
+        const response = await fetch(`${API_BASE_URL}/files/${fileId}`, {
+            method: 'DELETE'
+        });
+
+        console.log('刪除回應狀態:', response.status);
+        if (!response.ok) {
+            throw new Error(`刪除失敗: ${response.status}`);
+        }
+
+        console.log('檔案刪除成功');
+        // 重新載入檔案列表
+        getAllFiles();
+    } catch (error) {
+        console.error('刪除失敗:', error);
+        alert(`刪除失敗: ${error.message}`);
+    }
+}
+
+// 預覽媒體檔案
+function previewMedia(fileUrl, fileName, fileType) {
+    console.log('預覽媒體檔案:', {
+        url: fileUrl,
+        name: fileName,
+        type: fileType
+    });
+    
+    const mediaDialog = document.getElementById('mediaDialog');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const imageViewer = document.getElementById('imageViewer');
+    const mediaTitle = document.querySelector('.media-title');
+
+    console.log('預覽對話框元素:', mediaDialog);
+    console.log('影片播放器元素:', videoPlayer);
+    console.log('圖片檢視器元素:', imageViewer);
+
+    mediaDialog.style.display = 'block';
+    mediaTitle.textContent = fileName;
+
+    if (fileType === 'video') {
+        console.log('播放影片');
+        videoPlayer.style.display = 'block';
+        imageViewer.style.display = 'none';
+        videoPlayer.src = fileUrl;
+        videoPlayer.play();
+    } else if (fileType === 'image') {
+        console.log('顯示圖片');
+        videoPlayer.style.display = 'none';
+        imageViewer.style.display = 'block';
+        imageViewer.src = fileUrl;
     }
 }

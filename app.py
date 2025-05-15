@@ -7,13 +7,13 @@ import logging
 import os
 
 # 導入模組化路由
-from routers import images, notes, tags
+from routers import notes, tags, files
 from common import Config, init_db, logger
 
 # 建立主應用程式
 app = FastAPI(
     title="日記本 API",
-    description="一個支援圖片上傳和 Markdown 格式的日記本系統",
+    description="一個支援多媒體檔案上傳和 Markdown 格式的日記本系統",
     version=Config.API_VERSION,
     docs_url="/docs",
     redoc_url="/redoc"
@@ -41,9 +41,9 @@ templates = Jinja2Templates(directory="static/templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 整合路由模組
-app.include_router(images.router)
 app.include_router(notes.router)
 app.include_router(tags.router)
+app.include_router(files.router)
 
 # 根路由導向前端
 @app.get("/", response_class=HTMLResponse)

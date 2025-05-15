@@ -27,7 +27,7 @@ async def upload_image(file: UploadFile = File(...)):
     try:
         # 驗證檔案類型
         file_extension = Path(file.filename).suffix.lower()[1:]  # 去掉開頭的點
-        if file_extension not in Config.ALLOWED_EXTENSIONS:
+        if file_extension not in Config.ALLOWED_IMAGE_EXTENSIONS:
             raise HTTPException(status_code=400, detail=f"不支援的檔案類型: {file_extension}")
             
         # 計算檔案hash值
@@ -36,7 +36,7 @@ async def upload_image(file: UploadFile = File(...)):
         file_extension = Path(file.filename).suffix
         
         # 儲存圖片
-        file_location = Path(Config.UPLOAD_FOLDER) / f"{file_hash}{file_extension}"
+        file_location = Path(Config.UPLOAD_FOLDER_IMAGES) / f"{file_hash}{file_extension}"
         with open(file_location, "wb") as f:
             f.write(file_content)
         
@@ -59,7 +59,7 @@ async def get_image(filename: str):
     """
     獲取上傳的圖片
     """
-    file_location = Path(Config.UPLOAD_FOLDER) / filename
+    file_location = Path(Config.UPLOAD_FOLDER_IMAGES) / filename
     if not file_location.exists():
         return JSONResponse(
             status_code=404,

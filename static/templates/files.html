@@ -1,0 +1,407 @@
+<!-- 媒體預覽對話框 -->
+<div id="mediaDialog" class="media-dialog">
+    <div class="media-dialog-content">
+        <div class="media-dialog-header">
+            <span class="media-title"></span>
+            <button class="close-dialog">&times;</button>
+        </div>
+        <div class="media-content">
+            <!-- 視頻播放器 -->
+            <video id="videoPlayer" controls style="display: none;">
+                您的瀏覽器不支援 HTML5 video 標籤。
+            </video>
+            <!-- 圖片預覽 -->
+            <img id="imageViewer" style="display: none;">
+        </div>
+    </div>
+</div>
+
+<div id="filesSection" class="mdc-card">
+    <h2 class="mdc-typography--headline6">檔案管理</h2>
+    <p class="mdc-typography--body2">支援圖片、影片、音訊、壓縮檔等多種格式。</p>
+    
+    <!-- 上傳檔案區域 -->
+    <div class="file-upload-area">
+        <form id="uploadFileForm" enctype="multipart/form-data">
+            <div class="mdc-form-field">
+                <div class="mdc-text-field">
+                    <input type="file" id="fileInput" class="mdc-text-field__input" accept="image/*,video/*,audio/*,.pdf,.zip,.7z">
+                </div>
+            </div>
+            <button type="button" id="uploadFileBtn" class="mdc-button mdc-button--raised">
+                <span class="mdc-button__label">上傳檔案</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- 檔案列表 -->
+    <div class="file-list-container">
+        <h3 class="mdc-typography--subtitle1">檔案列表</h3>
+        <button id="getAllFiles" class="mdc-button">
+            <span class="mdc-button__label">重新整理</span>
+        </button>
+        <div id="filesList" class="files-gallery">
+            <div class="loading-message">載入中...</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .file-upload-area {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 2px dashed #ccc;
+        border-radius: 5px;
+    }
+
+    .file-list-container {
+        margin-top: 20px;
+    }
+
+    .files-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .file-card {
+        border: 1px solid #eee;
+        border-radius: 4px;
+        padding: 10px;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .file-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .file-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+        text-align: center;
+        color: #2196F3;
+    }
+
+    .file-info {
+        flex-grow: 1;
+    }
+
+    .file-name {
+        font-weight: bold;
+        margin-bottom: 5px;
+        word-break: break-all;
+    }
+
+    .file-size {
+        color: #666;
+        font-size: 0.8em;
+    }
+
+    .file-actions {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .loading-message {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 20px;
+        color: #666;
+    }
+
+    /* 影片播放對話框樣式 */
+    .video-dialog {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+    }
+
+    .video-dialog-content {
+        position: relative;
+        width: 90%;
+        max-width: 800px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .video-dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .video-title {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .close-dialog {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0 8px;
+    }
+
+    #videoPlayer {
+        width: 100%;
+        max-height: 70vh;
+        background: #000;
+    }
+
+    .play-button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+
+    .play-button:hover {
+        background-color: #45a049;
+    }
+
+    /* 媒體預覽對話框樣式 */
+    .media-dialog {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+
+    .media-dialog-content {
+        position: relative;
+        width: 95%;
+        max-width: 1200px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .media-dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .media-title {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+        max-width: 80%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .close-dialog {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 8px;
+        color: #666;
+        transition: color 0.3s ease;
+    }
+
+    .close-dialog:hover {
+        color: #000;
+    }
+
+    .media-content {
+        position: relative;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #000;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    #videoPlayer {
+        width: 100%;
+        max-height: 80vh;
+        background: #000;
+    }
+
+    #imageViewer {
+        max-width: 100%;
+        max-height: 80vh;
+        object-fit: contain;
+    }
+
+    .preview-button {
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .preview-button:hover {
+        background-color: #1976D2;
+    }
+
+    /* 播放器控制項美化 */
+    #videoPlayer::-webkit-media-controls-panel {
+        background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    }
+
+    #videoPlayer::-webkit-media-controls-play-button {
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mediaDialog = document.getElementById('mediaDialog');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const imageViewer = document.getElementById('imageViewer');
+    const mediaTitle = document.querySelector('.media-title');
+    const closeDialog = document.querySelector('.close-dialog');
+
+    // 關閉對話框
+    function closeMediaDialog() {
+        mediaDialog.style.display = 'none';
+        if (videoPlayer) {
+            videoPlayer.pause();
+            videoPlayer.currentTime = 0;
+            videoPlayer.src = '';
+        }
+        if (imageViewer) {
+            imageViewer.src = '';
+        }
+    }
+
+    // 關閉按鈕點擊事件
+    if (closeDialog) {
+        closeDialog.addEventListener('click', closeMediaDialog);
+    }
+
+    // 點擊背景關閉
+    mediaDialog.addEventListener('click', function(e) {
+        if (e.target === mediaDialog) {
+            closeMediaDialog();
+        }
+    });
+
+    // ESC 鍵關閉
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mediaDialog.style.display === 'block') {
+            closeMediaDialog();
+        }
+    });
+
+    // 註冊全局預覽函數
+    window.previewMedia = function(fileUrl, fileName, fileType) {
+        console.log('預覽媒體:', { fileUrl, fileName, fileType });
+        
+        if (!mediaDialog || !videoPlayer || !imageViewer || !mediaTitle) {
+            console.error('找不到必要的 DOM 元素');
+            return;
+        }
+
+        mediaDialog.style.display = 'block';
+        mediaTitle.textContent = fileName;
+
+        // 重置所有媒體元素
+        videoPlayer.style.display = 'none';
+        imageViewer.style.display = 'none';
+
+        if (fileType === 'video') {
+            console.log('播放影片');
+            videoPlayer.style.display = 'block';
+            videoPlayer.src = fileUrl;
+            videoPlayer.load();
+            videoPlayer.play().catch(e => console.error('影片播放失敗:', e));
+        } else if (fileType === 'image') {
+            console.log('顯示圖片');
+            imageViewer.style.display = 'block';
+            imageViewer.src = fileUrl;
+        }
+    };
+});
+
+// 檔案卡片生成函數
+window.createFileCard = function(file) {
+    const card = document.createElement('div');
+    card.className = 'file-card';
+    
+    const fileExt = file.filename.split('.').pop().toLowerCase();
+    let fileType = 'document';
+    let iconName = 'insert_drive_file';
+    
+    // 判斷檔案類型
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExt)) {
+        fileType = 'image';
+        iconName = 'image';
+    } else if (['mp4', 'webm', 'ogg'].includes(fileExt)) {
+        fileType = 'video';
+        iconName = 'video_library';
+    } else if (['mp3', 'wav'].includes(fileExt)) {
+        fileType = 'audio';
+        iconName = 'audio_file';
+    } else if (['pdf'].includes(fileExt)) {
+        iconName = 'picture_as_pdf';
+    } else if (['zip', '7z', 'rar'].includes(fileExt)) {
+        iconName = 'folder_zip';
+    }
+    
+    card.innerHTML = `
+        <div class="file-icon">
+            <i class="material-icons">${iconName}</i>
+        </div>
+        <div class="file-info">
+            <div class="file-name">${file.filename}</div>
+            <div class="file-size">${formatFileSize(file.size)}</div>
+        </div>
+        <div class="file-actions">
+            <a href="/files/download/${file.id}" class="mdc-button mdc-button--outlined">
+                <span class="mdc-button__label">下載</span>
+            </a>
+            ${(fileType === 'video' || fileType === 'image') ? `
+                <button onclick="previewMedia('/files/download/${file.id}', '${file.filename}', '${fileType}')" class="preview-button">
+                    ${fileType === 'video' ? '播放' : '預覽'}
+                </button>
+            ` : ''}
+            <button onclick="deleteFile(${file.id})" class="mdc-button mdc-button--outlined">
+                <span class="mdc-button__label">刪除</span>
+            </button>
+        </div>
+    `;
+    
+    return card;
+}
+</script>
