@@ -7,7 +7,7 @@ import logging
 import os
 
 # 導入模組化路由
-from routers import notes, tags, files
+from routers import notes, tags, files, share
 from common import Config, init_db, logger
 
 # 建立主應用程式
@@ -44,6 +44,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(notes.router)
 app.include_router(tags.router)
 app.include_router(files.router)
+app.include_router(share.router)
 
 # 根路由導向前端
 @app.get("/", response_class=HTMLResponse)

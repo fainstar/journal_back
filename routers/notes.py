@@ -28,30 +28,52 @@ async def save_markdown(data: dict):
         - **content_length**: 內容長度
     """
     try:
+        if "content" not in data:
+            raise HTTPException(status_code=400, detail="Missing content field")
+        
         # 解碼base64內容
-        content = base64.b64decode(data["content"]).decode('utf-8')
+        try:
+            content = base64.b64decode(data["content"].encode('utf-8')).decode('utf-8')
+        except Exception as e:
+            logger.error(f"Base64解碼失敗: {str(e)}")
+            raise HTTPException(status_code=400, detail=f"Invalid base64 content: {str(e)}")
+            
+        if not content:
+            raise HTTPException(status_code=400, detail="Empty content after decoding")
+            
+        logger.info(f"成功解碼文章內容，長度: {len(content)}")
         
         # 連接SQLite資料庫
         with get_db_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO markdown_notes (content) VALUES (?)", (content,))
-            note_id = cursor.lastrowid
             
-            # 處理標籤
-            if "tags" in data and isinstance(data["tags"], list) and data["tags"]:
-                for tag_name in data["tags"]:
-                    # 插入標籤(如不存在)
-                    cursor.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (tag_name,))
-                    # 獲取標籤ID
-                    cursor.execute("SELECT id FROM tags WHERE name = ?", (tag_name,))
-                    tag_id = cursor.fetchone()[0]
-                    # 建立關聯
-                    cursor.execute("INSERT INTO note_tags (note_id, tag_id) VALUES (?, ?)", 
-                                 (note_id, tag_id))
-            
-            conn.commit()
+            try:
+                # 插入文章內容
+                cursor.execute("INSERT INTO markdown_notes (content) VALUES (?)", (content,))
+                note_id = cursor.lastrowid
+                logger.info(f"成功插入文章，ID: {note_id}")
+                
+                # 處理標籤
+                if "tags" in data and isinstance(data["tags"], list) and data["tags"]:
+                    for tag_name in data["tags"]:
+                        # 插入標籤(如不存在)
+                        cursor.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (tag_name,))
+                        # 獲取標籤ID
+                        cursor.execute("SELECT id FROM tags WHERE name = ?", (tag_name,))
+                        tag_id = cursor.fetchone()[0]
+                        # 建立關聯
+                        cursor.execute("INSERT INTO note_tags (note_id, tag_id) VALUES (?, ?)", 
+                                     (note_id, tag_id))
+                        logger.info(f"添加標籤 '{tag_name}' 到文章 {note_id}")
+                
+                conn.commit()
+                logger.info(f"文章保存完成，ID: {note_id}")
+                
+            except Exception as e:
+                conn.rollback()
+                logger.error(f"資料庫操作失敗: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
         
-        logger.info(f"成功保存文章，ID: {note_id}")
         return {
             "message": "Markdown saved to database successfully!",
             "note_id": note_id,

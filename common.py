@@ -98,6 +98,17 @@ def init_db():
                         FOREIGN KEY (tag_id) REFERENCES tags (id),
                         PRIMARY KEY (note_id, tag_id))''')
         
+        # 建立檔案分享表
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS file_shares (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                file_id INTEGER NOT NULL,
+                share_code TEXT NOT NULL UNIQUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (file_id) REFERENCES files (id)
+            )
+        """)
+        
         # 移轉舊的圖片資料到新的檔案表
         try:
             cursor.execute("SELECT url, filename FROM images")

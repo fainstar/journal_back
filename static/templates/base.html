@@ -30,6 +30,46 @@
             padding: 10px;
             margin-bottom: 10px;
         }
+        .share-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .share-dialog .mdc-dialog__surface {
+            background: white;
+            padding: 24px;
+            border-radius: 4px;
+            min-width: 320px;
+            max-width: 600px;
+            margin: 20px;
+        }
+        
+        .share-dialog .mdc-dialog__scrim {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        
+        .share-dialog .mdc-dialog__content {
+            margin: 20px 0;
+        }
+        
+        .share-dialog .mdc-dialog__actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
         {% block additional_styles %}{% endblock %}
     </style>
 </head>

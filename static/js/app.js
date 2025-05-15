@@ -185,17 +185,26 @@ document.getElementById('saveMarkdown').addEventListener('click', async () => {
     }
 
     try {
+        console.log('開始保存文章...');
+        
         // 判斷是新增還是更新
         let url, method;
         if (currentEditingNoteId) {
-            // 更新現有文章
             url = `${API_BASE_URL}/notes/${currentEditingNoteId}`;
             method = 'PUT';
+            console.log('更新現有文章:', currentEditingNoteId);
         } else {
-            // 新增文章
             url = `${API_BASE_URL}/notes/create/`;
             method = 'POST';
+            console.log('創建新文章');
         }
+        
+        // 使用更安全的Base64編碼方式
+        const encoder = new TextEncoder();
+        const bytes = encoder.encode(content);
+        const contentBase64 = btoa(Array.from(bytes).map(b => String.fromCharCode(b)).join(''));
+            
+        console.log('內容編碼完成，準備發送請求...');
         
         const response = await fetch(url, {
             method: method,
@@ -203,9 +212,15 @@ document.getElementById('saveMarkdown').addEventListener('click', async () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                content: btoa(unescape(encodeURIComponent(content)))
+                content: contentBase64
             })
         });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        console.log('請求成功，狀態碼:', response.status);
         
         const data = await response.json();
         
@@ -228,6 +243,7 @@ document.getElementById('saveMarkdown').addEventListener('click', async () => {
         // 重新載入文章列表
         document.getElementById('getAllNotes').click();
     } catch (error) {
+        console.error('保存文章失敗:', error);
         document.getElementById('markdownResult').innerHTML = 
             `<div class="mdc-card" style="color: red;">
                 <p>儲存失敗: ${error.message}</p>
@@ -531,26 +547,16 @@ function createFileCard(file) {
     fileCard.dataset.fileId = file.id;
 
     try {
-        // 設置 icon，根據檔案類型選擇不同 icon
         const iconName = getFileIconByType(file.type);
-        console.log(`檔案類型: ${file.type}, 使用圖標: ${iconName}`);
-        
-        // 計算檔案大小的可讀格式
         const fileSize = formatFileSize(file.size);
-        console.log(`原始檔案大小: ${file.size}, 格式化後: ${fileSize}`);
-
-        // 判斷是否支援預覽
         const isPreviewable = ['image', 'video'].includes(file.type);
-        console.log(`檔案是否可預覽: ${isPreviewable}`);
-
-        // 準備預覽按鈕
+        
         const previewButton = isPreviewable ? `
             <button onclick="previewMedia('/files/download/${file.filename}', '${file.original_filename}', '${file.type}')" class="preview-button">
                 ${file.type === 'video' ? '播放' : '預覽'}
             </button>
         ` : '';
 
-        // 生成卡片內容
         fileCard.innerHTML = `
             <div class="file-icon">
                 <i class="material-icons">${iconName}</i>
@@ -564,13 +570,17 @@ function createFileCard(file) {
                     <span class="mdc-button__label">下載</span>
                 </a>
                 ${previewButton}
+                <button onclick="shareFile(${file.id})" class="mdc-button mdc-button--outlined">
+                    <i class="material-icons mdc-button__icon">share</i>
+                    <span class="mdc-button__label">分享</span>
+                </button>
                 <button onclick="deleteFile(${file.id})" class="mdc-button mdc-button--outlined">
+                    <i class="material-icons mdc-button__icon">delete</i>
                     <span class="mdc-button__label">刪除</span>
                 </button>
             </div>
         `;
         
-        console.log('檔案卡片創建成功');
         return fileCard;
     } catch (error) {
         console.error('創建檔案卡片時發生錯誤:', error);
@@ -723,5 +733,51 @@ function previewMedia(fileUrl, fileName, fileType) {
         videoPlayer.style.display = 'none';
         imageViewer.style.display = 'block';
         imageViewer.src = fileUrl;
+    }
+}
+
+// 分享文件
+async function shareFile(fileId) {
+    try {
+        console.log('創建分享連結:', fileId);
+        
+        const response = await fetch(`${API_BASE_URL}/share/create/${fileId}`, {
+            method: 'POST'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const shareUrl = window.location.origin + data.url;
+        
+        // 複製連結到剪貼簿
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            alert('分享連結已複製到剪貼簿：\n' + shareUrl);
+        }).catch(() => {
+            // 如果剪貼簿API失敗，至少顯示連結
+            alert('分享連結（請手動複製）：\n' + shareUrl);
+        });
+        
+    } catch (error) {
+        console.error('分享失敗:', error);
+        alert(`分享失敗: ${error.message}`);
+    }
+}
+
+// 複製分享連結
+function copyShareUrl(url) {
+    const input = document.getElementById('shareUrl');
+    input.select();
+    document.execCommand('copy');
+    alert('已複製分享連結到剪貼簿！');
+}
+
+// 關閉分享對話框
+function closeShareDialog() {
+    const dialog = document.querySelector('.share-dialog');
+    if (dialog) {
+        dialog.remove();
     }
 }

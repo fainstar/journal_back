@@ -317,3 +317,56 @@
 2025-05-15 13:10:03,790 - common - INFO - 請求下載/預覽檔案: ffdb61f6850df48681c208f4e98c1ad4.mp4
 2025-05-15 13:10:03,790 - common - INFO - 找到檔案記錄: 原始檔名=惡魔之子_4K.mp4, 類型=video
 2025-05-15 13:10:03,790 - common - INFO - 提供檔案預覽: video
+2025-05-15 13:19:51,403 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:19:51,404 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:19:51,409 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:19:51,412 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:20:12,472 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:20:12,479 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:20:15,029 - common - INFO - 開始獲取所有檔案列表
+2025-05-15 13:20:15,030 - common - INFO - 成功獲取檔案列表，數量: 5
+2025-05-15 13:22:18,173 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:22:18,179 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:22:18,223 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:22:18,229 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:22:51,653 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:22:51,664 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:22:51,900 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:22:51,906 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:30:16,498 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:30:16,513 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:30:16,537 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:30:16,544 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:46,292 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:46,292 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:46,301 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:46,301 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:47,262 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:47,265 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:47,269 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:47,273 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:48,238 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:48,240 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:48,245 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:48,247 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:46:51,072 - common - INFO - 開始獲取所有檔案列表
+2025-05-15 13:46:51,072 - common - INFO - 成功獲取檔案列表，數量: 5
+2025-05-15 13:47:06,296 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:47:06,304 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:47:08,490 - common - INFO - 開始獲取所有檔案列表
+2025-05-15 13:47:08,491 - common - INFO - 成功獲取檔案列表，數量: 5
+2025-05-15 13:47:12,148 - common - INFO - 請求下載/預覽檔案: 14ef4df4a4e6b2e9f9cfd6c2a0143b63.jpg
+2025-05-15 13:47:12,148 - common - INFO - 找到檔案記錄: 原始檔名=14ef4df4a4e6b2e9f9cfd6c2a0143b63.jpg, 類型=image
+2025-05-15 13:47:12,148 - common - INFO - 提供檔案預覽: image
+2025-05-15 13:48:29,215 - common - INFO - 開始獲取所有檔案列表
+2025-05-15 13:48:29,215 - common - INFO - 成功獲取檔案列表，數量: 5
+2025-05-15 13:50:02,384 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:50:02,398 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:50:02,426 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:50:02,432 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:50:19,271 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:50:19,282 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:50:19,282 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:50:19,289 - common - ERROR - 移轉圖片資料時發生錯誤: no such table: images
+2025-05-15 13:50:25,240 - common - INFO - 開始獲取所有檔案列表
+2025-05-15 13:50:25,241 - common - INFO - 成功獲取檔案列表，數量: 5

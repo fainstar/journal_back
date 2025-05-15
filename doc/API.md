@@ -2,52 +2,120 @@
 
 ## 基本信息
 
-- **基礎URL**: `http://127.0.0.1:8000`
-- **版本**: 1.0.0
-- **文件**: `/docs` (Swagger UI) 或 `/redoc` (ReDoc)
+- **基礎 URL**: `http://localhost:8000`
+- **API 版本**: v1.2.0
+- **回應格式**: JSON
+- **編碼方式**: UTF-8
+- **API 文件**: `/docs` (Swagger UI) 或 `/redoc` (ReDoc)
 
-## 通用結構
+## API 端點總覽
 
-所有 API 回應皆使用 JSON 格式，錯誤會以 HTTP 狀態碼和 JSON 物件返回：
+### 文章管理 API
+- `POST /notes/create/` - 建立新文章
+- `GET /notes/all/` - 獲取文章列表
+- `GET /notes/{note_id}` - 取得指定文章
+- `PUT /notes/{note_id}` - 更新文章內容
+- `DELETE /notes/{note_id}` - 刪除文章
+
+### 檔案管理 API
+- `POST /files/upload/` - 上傳檔案
+- `GET /files/all/` - 取得檔案列表
+- `GET /files/download/{filename}` - 下載檔案
+- `DELETE /files/{file_id}` - 刪除檔案
+
+### 圖片管理 API
+- `POST /images/upload/` - 上傳圖片
+- `GET /images/all/` - 獲取圖片列表
+- `GET /images/get/{filename}` - 取得圖片
+- `DELETE /images/delete/{filename}` - 刪除圖片
+
+### 分享功能 API
+- `POST /share/create/{file_id}` - 建立分享連結
+- `GET /share/{share_code}` - 存取分享內容
+
+## 安全性說明
+
+### 檔案上傳限制
+- 最大檔案大小: 100MB
+- 支援的檔案類型:
+  - 圖片: jpg, jpeg, png, gif, webp
+  - 影片: mp4, webm, ogg
+  - 音訊: mp3, wav
+  - 文件: pdf, doc, docx, txt
+  - 壓縮: zip, 7z, rar
+
+### 資料驗證
+- 所有上傳檔案都進行類型驗證
+- Markdown 內容使用 Base64 編碼
+- 檔案名稱安全處理
+- SQL 注入防護
+
+## 錯誤處理
+
+所有 API 錯誤會以標準格式返回：
 
 ```json
 {
-  "detail": "錯誤訊息"
+  "detail": "錯誤訊息描述"
 }
 ```
 
-## 模組化設計
+### HTTP 狀態碼
+- 200: 請求成功
+- 400: 請求參數錯誤
+- 401: 未授權訪問
+- 404: 資源不存在
+- 500: 伺服器內部錯誤
 
-系統採用模組化設計，API 路由分為以下幾個模組：
+## API 詳細說明
 
-1. **圖片管理** (`/images`)
-2. **文章管理** (`/notes`)
-3. **標籤管理** (`/tags`)
+### 檔案分享功能
 
-## 圖片管理 API
-
-### 上傳圖片
-
-- **端點**: `POST /images/upload/`
-- **描述**: 上傳新圖片
-- **請求體**: Form-data 格式
-  - `file`: 圖片檔案
-- **回應**:
+#### 建立分享連結
+- **端點**: `POST /share/create/{file_id}`
+- **描述**: 為檔案創建分享連結
+- **參數**:
+  - `file_id`: 要分享的檔案ID
+- **成功回應** (200):
   ```json
   {
-    "url": "http://127.0.0.1:8000/images/get/[filename]"
+    "share_code": "隨機生成的分享代碼",
+    "url": "/share/分享代碼"
   }
   ```
 
-### 獲取圖片
-
-- **端點**: `GET /images/get/{filename}`
-- **描述**: 獲取已上傳的圖片
+#### 存取分享內容
+- **端點**: `GET /share/{share_code}`
+- **描述**: 存取分享的檔案內容
 - **參數**:
-  - `filename`: 圖片檔名
-- **回應**: 圖片檔案
+  - `share_code`: 分享代碼
+- **回應**: 
+  - 圖片/影片: 直接顯示預覽
+  - 其他檔案: 直接下載
+- **錯誤回應** (404):
+  ```json
+  {
+    "detail": "Shared file not found"
+  }
+  ```
 
-### 獲取所有圖片
+### 檔案管理
+
+#### 上傳檔案
+- **端點**: `POST /files/upload/`
+- **描述**: 上傳任意類型檔案
+- **請求格式**: `multipart/form-data`
+- **參數**:
+  - `file`: 檔案資料
+- **成功回應** (200):
+  ```json
+  {
+    "filename": "儲存的檔名",
+    "original_filename": "原始檔名",
+    "size": 1024,
+    "type": "檔案類型"
+  }
+  ```
 
 - **端點**: `GET /images/all/`
 - **描述**: 獲取所有已上傳的圖片
